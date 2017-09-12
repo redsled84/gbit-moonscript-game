@@ -8,6 +8,8 @@ class Bullet
   draw: =>
     g.setColor 255, 255, 255
     g.rectangle "fill", @x, @y, @radius
+  outOfBounds: =>
+    return not (@x > 0 and @x < g.getWidth! and @y > 0 and @y < g.getHeight!)
 
 class Player
   new: =>
@@ -65,11 +67,13 @@ class Player
     if key == "down"
       bullet = Bullet x, y, 0, @speed * speedMultiplier, radius
       @bullets[#@bullets+1] = bullet
-  -- boundBullets: =>
-  --   -- how to loop reverse?
-  --   for i = @bullets, 1, -1
-  --     if b.x < 0 or b.x > g.getWidth! or b.y < 0 or b.y > g.getHeight!
-  --       table.remove(@bullets, i)
+  boundBullets: =>
+    -- how to loop reverse?
+    for i = #@bullets, 1, -1
+      local b
+      b = @bullets[i]
+      if b\outOfBounds!
+        table.remove(@bullets, i)
 
 
 player = Player!
@@ -80,7 +84,8 @@ love.load = ->
     player\velocityConstants!
     player\applyVelocities dt
     player\applyBulletVelocities dt
-    -- player\boundBullets
+    print #player.bullets
+    player\boundBullets!
 
   love.draw = ->
     player\draw!

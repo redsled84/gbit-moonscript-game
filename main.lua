@@ -11,6 +11,9 @@ do
     draw = function(self)
       g.setColor(255, 255, 255)
       return g.rectangle("fill", self.x, self.y, self.radius)
+    end,
+    outOfBounds = function(self)
+      return not (self.x > 0 and self.x < g.getWidth() and self.y > 0 and self.y < g.getHeight())
     end
   }
   _base_0.__index = _base_0
@@ -93,6 +96,15 @@ do
         bullet = Bullet(x, y, 0, self.speed * speedMultiplier, radius)
         self.bullets[#self.bullets + 1] = bullet
       end
+    end,
+    boundBullets = function(self)
+      for i = #self.bullets, 1, -1 do
+        local b
+        b = self.bullets[i]
+        if b:outOfBounds() then
+          table.remove(self.bullets, i)
+        end
+      end
     end
   }
   _base_0.__index = _base_0
@@ -125,7 +137,9 @@ love.load = function()
   love.update = function(dt)
     player:velocityConstants()
     player:applyVelocities(dt)
-    return player:applyBulletVelocities(dt)
+    player:applyBulletVelocities(dt)
+    print(#player.bullets)
+    return player:boundBullets()
   end
   love.draw = function()
     return player:draw()
